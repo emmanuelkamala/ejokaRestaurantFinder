@@ -1,0 +1,38 @@
+:root {
+  --mainWhite: #027a2065;
+  --mainDark: #333333;
+  --mainRed: #04720a;
+}
+body {
+  background: var(--mainWhite);
+  color: var(--mainDark);
+  font-family: 'Roboto Condensed', sans-serif;
+}
+.redBtn {
+  border-color: var(--mainRed);
+  color: var(--mainRed);
+  background: transparent;
+}
+.redText {
+  color: var(--mainRed);
+}
+.redBtn:hover {
+  background: var(--mainRed);
+  color: var(--mainDark);
+}
+.form-control {
+  border-color: var(--mainRed);
+}
+.feedback {
+  display: none;
+}
+.loader {
+  margin: 0 auto;
+  display: none;
+}
+.card p {
+  font-size: 0.7rem;
+}
+.showItem {
+  display: block;
+}
