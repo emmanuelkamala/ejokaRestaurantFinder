@@ -15,6 +15,7 @@ class Ejoka {
         const categoryURL = `https://developers.zomato.com/api/v2.1/categories`;
         const cityURL = `https://developers.zomato.com/api/v2.1/cities?=${city}`;
         
+        
         const categoryInfo = await fetch(categoryURL, this.header);
         const categoryJSON = await categoryInfo.json();
         const categories = await categoryJSON.categories;
@@ -26,12 +27,19 @@ class Ejoka {
         let cityID;
 
         if (cityLocation.length > 0){
-            cityID = await cityLocation[0].id;    
+            return cityID = await cityLocation[0].id;    
         }
+
+        const restaurantURL = `https://developers.zomato.com/api/v2.1/search?entity_id=${cityID}&entity_type=city&category=${categoryID}&sort=rating`;
+
+        const restaurantInfo = await fetch(restaurantURL, this.header);
+        const restaurantJSON = await restaurantInfo.json();
+        const restaurants = await restaurantJSON.restaurants;
         
         return {
             categories,
-            cityID
+            cityID, 
+            restaurants
         };
     }
 }
@@ -67,6 +75,23 @@ class UI {
     hideLoader(){
         this.loader.classList.remove('showItem');
     }
+
+    getRestaurants(restaurants){
+        this.hideLoader();
+        if (restaurants.length === 0){
+            this.showFeedback('No such categories exist in the selected city');
+        } else {
+            this.restaurantList.innerHTML = '';
+            restaurants.forEach(restaurant => {
+                const { thumb:img, name, location:{address}, user_rating:{aggregate_rating}, cuisines, average_cost_for_two:cost, menu_url, url} = restaurant.restaurant;
+                if (img !== ''){
+                    this.showRestaurant(img, name, address, aggregate_rating, cuisines, cost, menu_url, url)
+                }
+            })
+            
+        }
+
+    }
 }
 
 (function(){
@@ -94,7 +119,9 @@ class UI {
                     ui.showFeedback('Please enter a valid city');
                 } else {
                     ui.showLoader();
-                    ejoka.searchAPI(city, categoryID).then(data => console.log(data));
+                    ejoka.searchAPI(city, categoryID).then(data => {
+                        ui.getRestaurants(data.restaurants);
+                    });
                     
                 }
                 
