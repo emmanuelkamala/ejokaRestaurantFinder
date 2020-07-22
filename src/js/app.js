@@ -38,6 +38,15 @@ class UI {
         })
         search.innerHTML = output;
     }
+
+    showFeedback(text){
+        const feedback = document.querySelector('.feedback');
+        feedback.classList.add('showItem');
+        feedback.innerHTML = `<p>${text}</p>`;
+        setTimeout(() => {
+            feedback.classList.remove('showItem');
+        }, 3000)
+    }
 }
 
 (function(){
@@ -50,5 +59,16 @@ class UI {
 
     document.addEventListener('DOMContentLoaded', () => {
         ejoka.searchAPI().then(data => ui.addSelectOptions(data.categories));  
+    })
+
+    searchForm.addEventListener('submit', event => {
+        event.preventDefault();
+
+        const city = searchCity.value.toLowerCase();
+        const categoryID = parseInt(searchCategory.value);
+        if (city === '' || categoryID === 0){
+            ui.showFeedback('Please enter City and Select Category');
+        }
+        
     })
 })();
