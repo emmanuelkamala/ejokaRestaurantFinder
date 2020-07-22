@@ -11,15 +11,27 @@ class Ejoka {
         };
     }
 
-    async searchAPI(){
+    async searchAPI(city, categoryID){
         const categoryURL = `https://developers.zomato.com/api/v2.1/categories`;
+        const cityURL = `https://developers.zomato.com/api/v2.1/cities?=${city}`;
         
         const categoryInfo = await fetch(categoryURL, this.header);
         const categoryJSON = await categoryInfo.json();
         const categories = await categoryJSON.categories;
 
+        const cityInfo = await fetch(cityURL, this.header);
+        const cityJSON = await cityInfo.json();
+        const cityLocation = await cityJSON.location_suggestions;
+
+        let cityID;
+
+        if (cityLocation.length > 0){
+            cityID = await cityLocation[0].id;    
+        }
+        
         return {
-            categories
+            categories,
+            cityID
         };
     }
 }
@@ -47,6 +59,14 @@ class UI {
             feedback.classList.remove('showItem');
         }, 3000)
     }
+
+    showLoader(){
+        this.loader.classList.add('showItem');
+    }
+
+    hideLoader(){
+        this.loader.classList.remove('showItem');
+    }
 }
 
 (function(){
@@ -68,6 +88,17 @@ class UI {
         const categoryID = parseInt(searchCategory.value);
         if (city === '' || categoryID === 0){
             ui.showFeedback('Please enter City and Select Category');
+        } else {
+            ejoka.searchAPI(city).then(cityData => {
+                if (cityData.cityID === 0){
+                    ui.showFeedback('Please enter a valid city');
+                } else {
+                    ui.showLoader();
+                    ejoka.searchAPI(city, categoryID).then(data => console.log(data));
+                    
+                }
+                
+            })
         }
         
     })
